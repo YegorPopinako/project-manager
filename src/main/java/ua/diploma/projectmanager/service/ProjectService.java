@@ -6,11 +6,10 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import ua.diploma.projectmanager.dto.project.ProjectDto;
+import ua.diploma.projectmanager.dto.project.ProjectFullInfoDto;
 import ua.diploma.projectmanager.dto.project.UpdateProjectDto;
 import ua.diploma.projectmanager.model.Project;
 import ua.diploma.projectmanager.repository.ProjectRepository;
-
-import java.util.Optional;
 
 import static java.util.Objects.isNull;
 
@@ -21,26 +20,26 @@ public class ProjectService {
     private final ProjectRepository projectRepository;
     private final ModelMapper modelMapper;
 
-    public Project getProject(Long id) {
-        if(isNull(id) || !projectRepository.existsById(id)){
-            throw new EntityNotFoundException("Invalid id value");
-        }
-        Optional<Project> project = projectRepository.findById(id);
-        return project.orElseThrow(() -> new EntityNotFoundException("Project with id " + id + " not found"));
+    public ProjectFullInfoDto getProject(Long id) {
+        Project project = projectRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Project with id " + id + " not found"));
+        return modelMapper.map(project, ProjectFullInfoDto.class);
     }
 
     @Transactional
-    public Project createProject(ProjectDto projectDto) {
+    public ProjectFullInfoDto createProject(ProjectDto projectDto) {
         Project project = modelMapper.map(projectDto, Project.class);
-        return projectRepository.save(project);
+        return modelMapper.map(projectRepository.save(project), ProjectFullInfoDto.class);
     }
 
     @Transactional
-    public Project updateProject(UpdateProjectDto projectDto) {
-        Project existingProject = getProject(projectDto.getId());
-        existingProject.setTitle(projectDto.getTitle());
-        existingProject.setDescription(projectDto.getDescription());
-        return projectRepository.save(existingProject);
+    public ProjectFullInfoDto updateProject(UpdateProjectDto projectDto) {
+        if (isNull(projectDto.getId()) || !projectRepository.existsById(projectDto.getId())) {
+            throw new EntityNotFoundException("Invalid ID value");
+        }
+        Project entity = modelMapper.map(projectDto, Project.class);
+
+        return modelMapper.map(projectRepository.save(entity), ProjectFullInfoDto.class);
     }
 
     @Transactional
