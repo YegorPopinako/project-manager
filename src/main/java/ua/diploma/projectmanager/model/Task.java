@@ -21,11 +21,13 @@ public class Task {
 
     private String status;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "project_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "project_id", nullable = false)
     private Project project;
 
     private Integer estimate;
+
+    private LocalDateTime createdAt;
 
     private LocalDateTime startPoint;
 
@@ -33,3 +35,4 @@ public class Task {
 
     private LocalDateTime updatedAt;
 }
+

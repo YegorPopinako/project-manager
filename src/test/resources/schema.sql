@@ -19,6 +19,7 @@ CREATE TABLE `task` (
                         `description` varchar(255) DEFAULT NULL,
                         `status` varchar(255) DEFAULT NULL,
                         `title` varchar(255) DEFAULT NULL,
+                        `created_at` datetime(6) DEFAULT NULL,
                         PRIMARY KEY (`id`),
                         KEY `FKk8qrwowg31kx7hp93sru1pdqa` (`project_id`),
                         CONSTRAINT `FKk8qrwowg31kx7hp93sru1pdqa` FOREIGN KEY (`project_id`) REFERENCES `project` (`id`)
