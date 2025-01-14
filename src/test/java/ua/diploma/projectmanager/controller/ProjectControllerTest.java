@@ -193,11 +193,6 @@ class ProjectControllerTest {
     @Test
     @SneakyThrows
     void deleteProjectWithInvalidId() {
-        Project project = new Project();
-        project.setTitle("Project 1");
-        project.setDescription("Description 1");
-        projectRepository.save(project);
-
         mockMvc.perform(delete("/api/project/234"))
                 .andExpect(status().isNotFound());
     }
