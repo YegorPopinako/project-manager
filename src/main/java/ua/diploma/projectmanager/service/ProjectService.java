@@ -7,7 +7,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import ua.diploma.projectmanager.dto.project.ProjectDto;
 import ua.diploma.projectmanager.dto.project.ProjectFullInfoDto;
-import ua.diploma.projectmanager.dto.project.UpdateProjectDto;
+import ua.diploma.projectmanager.dto.project.ProjectUpdateDto;
 import ua.diploma.projectmanager.model.Project;
 import ua.diploma.projectmanager.repository.ProjectRepository;
 
@@ -33,7 +33,7 @@ public class ProjectService {
     }
 
     @Transactional
-    public ProjectFullInfoDto updateProject(UpdateProjectDto projectDto) {
+    public ProjectFullInfoDto updateProject(ProjectUpdateDto projectDto) {
         if (isNull(projectDto.getId()) || !projectRepository.existsById(projectDto.getId())) {
             throw new EntityNotFoundException("Invalid ID value");
         }

@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ua.diploma.projectmanager.dto.project.ProjectDto;
 import ua.diploma.projectmanager.dto.project.ProjectFullInfoDto;
-import ua.diploma.projectmanager.dto.project.UpdateProjectDto;
+import ua.diploma.projectmanager.dto.project.ProjectUpdateDto;
 import ua.diploma.projectmanager.service.ProjectService;
 
 @RestController
@@ -28,8 +28,8 @@ public class ProjectController {
     }
 
     @PutMapping
-    public ProjectFullInfoDto updateProject(@Valid @RequestBody UpdateProjectDto updateProjectDto) {
-        return projectService.updateProject(updateProjectDto);
+    public ProjectFullInfoDto updateProject(@Valid @RequestBody ProjectUpdateDto projectUpdateDto) {
+        return projectService.updateProject(projectUpdateDto);
     }
 
     @DeleteMapping("/{id}")
