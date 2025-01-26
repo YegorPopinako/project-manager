@@ -1,7 +1,6 @@
 package ua.diploma.projectmanager.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -26,18 +25,18 @@ public class User implements UserDetails {
 
     private String displayName;
 
-    @Size(max = 128)
-    @Column(unique = true, nullable = false)
-    private String email;
-
-    @Size(min = 5, max = 128)
-    private String password;
-
-    @Size(min = 2, max = 32)
+    @Column(name = "first_name")
     private String firstName;
 
-    @Size(max = 32)
+    @Column(name = "last_name")
     private String lastName;
+
+    @Column(name = "email", unique = true)
+    private String email;
+
+    private String password;
+
+    private int age;
 
     @CollectionTable(
             name = "user_role",
@@ -61,6 +60,7 @@ public class User implements UserDetails {
     }
 
     @PostPersist
+    @PostUpdate
     private void calculateDisplayName() {
         this.displayName = firstName + " " + lastName;
     }

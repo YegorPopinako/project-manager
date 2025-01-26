@@ -3,7 +3,6 @@ package ua.diploma.projectmanager.service;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import ua.diploma.projectmanager.dto.task.TaskDto;
@@ -17,7 +16,6 @@ import java.time.LocalDateTime;
 
 import static java.util.Objects.isNull;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TaskService {
