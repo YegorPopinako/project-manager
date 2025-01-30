@@ -14,6 +14,9 @@ import ua.diploma.projectmanager.dto.user.UserFullInfoDto;
 import ua.diploma.projectmanager.exception.EmailAlreadyInUseException;
 import ua.diploma.projectmanager.model.User;
 import ua.diploma.projectmanager.repository.UserRepository;
+import ua.diploma.projectmanager.security.login.Role;
+
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +34,7 @@ public class AuthService {
         }
         User user = modelMapper.map(userDto, User.class);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setRoles(Set.of(Role.USER));
         return modelMapper.map(userRepository.save(user), UserFullInfoDto.class);
     }
 
