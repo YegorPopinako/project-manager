@@ -49,6 +49,15 @@ public class User implements UserDetails {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<Role> roles;
 
+    @ManyToMany
+    @JoinTable(
+            name = "user_project",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "project_id")
+    )
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Set<Project> projects;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles;
