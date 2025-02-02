@@ -5,10 +5,14 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import ua.diploma.projectmanager.dto.user.AssignUserDto;
 import ua.diploma.projectmanager.dto.user.UserFullInfoDto;
 import ua.diploma.projectmanager.dto.user.UserUpdateDto;
 import ua.diploma.projectmanager.exception.EmailAlreadyInUseException;
+import ua.diploma.projectmanager.model.Project;
 import ua.diploma.projectmanager.model.User;
+import ua.diploma.projectmanager.repository.ProjectRepository;
+import ua.diploma.projectmanager.repository.TaskRepository;
 import ua.diploma.projectmanager.repository.UserRepository;
 import ua.diploma.projectmanager.service.mapper.UserMapper;
 
@@ -16,7 +20,9 @@ import ua.diploma.projectmanager.service.mapper.UserMapper;
 @RequiredArgsConstructor
 public class UserService {
 
+    private final ProjectRepository projectRepository;
     private final UserRepository userRepository;
+    private final TaskRepository taskRepository;
     private final ModelMapper modelMapper;
     private final UserMapper userMapper;
 
@@ -44,5 +50,25 @@ public class UserService {
     public void deleteUser(Long id) {
         getUser(id);
         userRepository.deleteById(id);
+    }
+
+    @Transactional
+    public void assignUserToProject(AssignUserDto dto) {
+        Project project = projectRepository.findById(dto.getProjectId())
+                .orElseThrow(() -> new EntityNotFoundException("Project not found"));
+
+        User user = userRepository.findByEmail(dto.getUserEmail())
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+        user.getProjects().add(project);
+        userRepository.save(user);
+    }
+
+    public boolean isUserAssignedToProject(Long projectId, String email) {
+        return userRepository.existsByEmailAndProjects_Id(email, projectId);
+    }
+
+    public boolean isUserAssignedToTaskProject(Long taskId, String email) {
+        return taskRepository.existsByIdAndProject_Users_Email(taskId, email);
     }
 }
