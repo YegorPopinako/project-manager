@@ -11,10 +11,9 @@ import ua.diploma.projectmanager.dto.task.TaskUpdateDto;
 import ua.diploma.projectmanager.model.Task;
 import ua.diploma.projectmanager.repository.ProjectRepository;
 import ua.diploma.projectmanager.repository.TaskRepository;
+import ua.diploma.projectmanager.service.mapper.TaskMapper;
 
 import java.time.LocalDateTime;
-
-import static java.util.Objects.isNull;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +22,7 @@ public class TaskService {
     private final TaskRepository taskRepository;
     private final ProjectRepository projectRepository;
     private final ModelMapper modelMapper;
+    private final TaskMapper taskMapper;
 
     public TaskFullInfoDto getTask(Long id) {
         Task task = taskRepository.findById(id)
@@ -45,12 +45,12 @@ public class TaskService {
 
     @Transactional
     public TaskFullInfoDto updateTask(TaskUpdateDto taskDto) {
-        if (isNull(taskDto.getId()) || !taskRepository.existsById(taskDto.getId())) {
-            throw new EntityNotFoundException("Invalid ID value");
-        }
-        Task entity = modelMapper.map(taskDto, Task.class);
+        var task = taskRepository.findById(taskDto.getId())
+                .orElseThrow(() -> new EntityNotFoundException("Task with id: %s not found".formatted(taskDto.getId())));
 
-        return modelMapper.map(taskRepository.save(entity), TaskFullInfoDto.class);
+        taskMapper.mapTaskFromTaskDto(taskDto, task);
+
+        return modelMapper.map(taskRepository.save(task), TaskFullInfoDto.class);
     }
 
     @Transactional

@@ -38,8 +38,12 @@ public class ProjectService {
             throw new EntityNotFoundException("Invalid ID value");
         }
         Project entity = modelMapper.map(projectDto, Project.class);
+        var project = projectRepository.findById(projectDto.getId())
+                .orElseThrow(() -> new EntityNotFoundException("User with id: %s not found".formatted(projectDto.getId())));
 
-        return modelMapper.map(projectRepository.save(entity), ProjectFullInfoDto.class);
+        projectMapper.mapProjectFromProjectDto(projectDto, project);
+
+        return modelMapper.map(projectRepository.save(project), ProjectFullInfoDto.class);
     }
 
     @Transactional
