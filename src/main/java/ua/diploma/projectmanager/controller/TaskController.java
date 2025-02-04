@@ -18,26 +18,26 @@ public class TaskController {
     private final TaskService taskService;
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('DEV', 'MANAGER', 'ADMIN')")
-    public TaskFullInfoDto getProject(@PathVariable Long id) {
+    @PreAuthorize("hasRole('ADMIN') or @userService.isUserAssignedToTaskProject(#id, authentication.principal.username)")
+    public TaskFullInfoDto getTask(@PathVariable Long id) {
         return taskService.getTask(id);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("hasAnyRole('DEV', 'MANAGER', 'ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or (hasAnyRole('MANAGER', 'DEV') and @userService.isUserAssignedToTaskProject(#taskDto.projectId, authentication.principal.username))")
     public TaskFullInfoDto createTask(@Valid @RequestBody TaskDto taskDto) {
         return taskService.createTask(taskDto);
     }
 
     @PutMapping
-    @PreAuthorize("hasAnyRole('MANAGER', 'ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or (hasRole('MANAGER') and @userService.isUserAssignedToTaskProject(#taskUpdateDto.id, authentication.principal.username))")
     public TaskFullInfoDto updateTask(@Valid @RequestBody TaskUpdateDto taskUpdateDto) {
         return taskService.updateTask(taskUpdateDto);
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('MANAGER', 'ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or (hasRole('MANAGER') and @userService.isUserAssignedToTaskProject(#id, authentication.principal.username))")
     public void deleteTask(@PathVariable Long id) {
         taskService.deleteTask(id);
     }

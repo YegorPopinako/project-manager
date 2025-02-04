@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import ua.diploma.projectmanager.dto.project.ProjectDto;
 import ua.diploma.projectmanager.dto.project.ProjectFullInfoDto;
@@ -18,7 +19,7 @@ public class ProjectController {
     private final ProjectService projectService;
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('USER', 'DEV', 'MANAGER', 'ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or @userService.isUserAssignedToProject(#id, authentication.principal.username)")
     public ProjectFullInfoDto getProject(@PathVariable Long id) {
         return projectService.getProject(id);
     }
@@ -26,18 +27,19 @@ public class ProjectController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasAnyRole('MANAGER', 'ADMIN')")
-    public ProjectFullInfoDto createProject(@Valid @RequestBody ProjectDto projectDto) {
-        return projectService.createProject(projectDto);
+    public ProjectFullInfoDto createProject(@Valid @RequestBody ProjectDto projectDto,
+                                            Authentication authentication) {
+        return projectService.createProject(projectDto, authentication.getName());
     }
 
     @PutMapping
-    @PreAuthorize("hasAnyRole('MANAGER', 'ADMIN')")
+    @PreAuthorize("(hasRole('ADMIN')) or (hasRole('MANAGER') and @userService.isUserAssignedToProject(#projectUpdateDto.id, authentication.principal.username))")
     public ProjectFullInfoDto updateProject(@Valid @RequestBody ProjectUpdateDto projectUpdateDto) {
         return projectService.updateProject(projectUpdateDto);
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("(hasRole('ADMIN')) or (hasRole('MANAGER') and @userService.isUserAssignedToProject(#id, authentication.principal.username))")
     public void deleteProject(@PathVariable Long id) {
         projectService.deleteProject(id);
     }
