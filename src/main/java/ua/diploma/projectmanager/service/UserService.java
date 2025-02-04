@@ -63,6 +63,18 @@ public class UserService {
         user.getProjects().add(project);
         userRepository.save(user);
     }
+    
+    @Transactional
+    public void unassignUserFromProject(AssignUserDto dto) {
+        Project project = projectRepository.findById(dto.getProjectId())
+                .orElseThrow(() -> new EntityNotFoundException("Project not found"));
+
+        User user = userRepository.findByEmail(dto.getUserEmail())
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+        user.getProjects().remove(project);
+        userRepository.save(user);
+    }
 
     public boolean isUserAssignedToProject(Long projectId, String email) {
         return userRepository.existsByEmailAndProjects_Id(email, projectId);

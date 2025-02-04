@@ -35,9 +35,20 @@ public class UserController {
     }
 
     @PostMapping("/assign")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @PreAuthorize("(hasRole('ADMIN')) or (hasRole('MANAGER') and @userService.isUserAssignedToProject(#assignUserDto.projectId, authentication.principal.username))")
     public ResponseEntity<String> assignUserToProject(@RequestBody AssignUserDto assignUserDto) {
         userService.assignUserToProject(assignUserDto);
-        return ResponseEntity.ok("User %s assigned to project successfully".formatted(assignUserDto.getUserEmail()));
+        return ResponseEntity.ok("User %s assigned to project %d successfully".formatted(
+                assignUserDto.getUserEmail(), assignUserDto.getProjectId()
+        ));
+    }
+
+    @PostMapping("/unassign")
+    @PreAuthorize("(hasRole('ADMIN')) or (hasRole('MANAGER') and @userService.isUserAssignedToProject(#assignUserDto.projectId, authentication.principal.username))")
+    public ResponseEntity<String> unassignUserFromProject(@RequestBody AssignUserDto assignUserDto) {
+        userService.unassignUserFromProject(assignUserDto);
+        return ResponseEntity.ok("User %s unassigned to project %d successfully".formatted(
+                assignUserDto.getUserEmail(), assignUserDto.getProjectId()
+        ));
     }
 }
