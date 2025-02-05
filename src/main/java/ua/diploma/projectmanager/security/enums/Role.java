@@ -1,4 +1,4 @@
-package ua.diploma.projectmanager.security.login;
+package ua.diploma.projectmanager.security.enums;
 
 import org.springframework.security.core.GrantedAuthority;
 
