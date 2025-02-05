@@ -6,9 +6,10 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import ua.diploma.projectmanager.security.login.Role;
+import ua.diploma.projectmanager.security.enums.Role;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -57,6 +58,9 @@ public class User implements UserDetails {
     )
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<Project> projects;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Task> tasks;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

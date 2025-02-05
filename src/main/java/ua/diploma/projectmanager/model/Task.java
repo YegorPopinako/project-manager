@@ -28,6 +28,10 @@ public class Task {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Project project;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
     private Integer estimate;
 
     private LocalDateTime createdAt;
