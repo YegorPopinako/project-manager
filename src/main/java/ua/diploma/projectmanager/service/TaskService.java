@@ -49,6 +49,7 @@ public class TaskService {
                 .orElseThrow(() -> new EntityNotFoundException("Task with id: %s not found".formatted(taskDto.getId())));
 
         taskMapper.mapTaskFromTaskDto(taskDto, task);
+        task.setUpdatedAt(LocalDateTime.now());
 
         return modelMapper.map(taskRepository.save(task), TaskFullInfoDto.class);
     }
