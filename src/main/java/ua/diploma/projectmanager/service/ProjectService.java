@@ -13,7 +13,7 @@ import ua.diploma.projectmanager.model.Project;
 import ua.diploma.projectmanager.model.User;
 import ua.diploma.projectmanager.repository.ProjectRepository;
 import ua.diploma.projectmanager.repository.UserRepository;
-import ua.diploma.projectmanager.security.login.Role;
+import ua.diploma.projectmanager.security.enums.Role;
 import ua.diploma.projectmanager.service.mapper.ProjectMapper;
 
 import java.util.Set;
