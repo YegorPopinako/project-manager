@@ -118,7 +118,7 @@ public class UserService {
 
     private void validateUserProjectAssignment(Long id, String email) {
         if(!isUserAssignedToProjectByTask(id, email)) {
-            throw new IllegalStateException("User is not assigned to this project");
+            throw new IllegalStateException("User is not assigned to project related to this task");
         }
     }
 }

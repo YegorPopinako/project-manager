@@ -37,4 +37,10 @@ public class GlobalExceptionHandler {
         log.error("Occurred Exception: {} ", ex.getMessage(), ex);
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<String> handleIllegalStateException(IllegalStateException ex) {
+        log.error("Occurred Exception: {} ", ex.getMessage(), ex);
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
 }
