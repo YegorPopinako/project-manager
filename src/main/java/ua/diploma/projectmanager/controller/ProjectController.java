@@ -11,6 +11,7 @@ import ua.diploma.projectmanager.dto.project.ProjectDto;
 import ua.diploma.projectmanager.dto.project.ProjectFullInfoDto;
 import ua.diploma.projectmanager.dto.project.ProjectUpdateDto;
 import ua.diploma.projectmanager.dto.user.AssignUserDto;
+import ua.diploma.projectmanager.security.enums.AssignmentType;
 import ua.diploma.projectmanager.service.ProjectService;
 import ua.diploma.projectmanager.service.UserService;
 
@@ -51,7 +52,11 @@ public class ProjectController {
     @PostMapping("/assign")
     @PreAuthorize("(hasRole('ADMIN')) or (hasRole('MANAGER') and @userService.isUserAssignedToProject(#assignUserDto.id, authentication.principal.username))")
     public ResponseEntity<String> assignUserToProject(@RequestBody AssignUserDto assignUserDto) {
-        userService.assignUser(assignUserDto);
+        userService.assignUser(new AssignUserDto(
+                assignUserDto.getId(),
+                assignUserDto.getUserEmail(),
+                AssignmentType.PROJECT));
+
         return ResponseEntity.ok("User %s assigned to project %d successfully".formatted(
                 assignUserDto.getUserEmail(), assignUserDto.getId()
         ));
@@ -60,7 +65,11 @@ public class ProjectController {
     @PostMapping("/unassign")
     @PreAuthorize("(hasRole('ADMIN')) or (hasRole('MANAGER') and @userService.isUserAssignedToProject(#assignUserDto.id, authentication.principal.username))")
     public ResponseEntity<String> unassignUserFromProject(@RequestBody AssignUserDto assignUserDto) {
-        userService.unassignUser(assignUserDto);
+        userService.unassignUser(new AssignUserDto(
+                assignUserDto.getId(),
+                assignUserDto.getUserEmail(),
+                AssignmentType.PROJECT));
+
         return ResponseEntity.ok("User %s unassigned to project %d successfully".formatted(
                 assignUserDto.getUserEmail(), assignUserDto.getId()
         ));

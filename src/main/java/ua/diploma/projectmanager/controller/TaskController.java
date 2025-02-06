@@ -10,6 +10,7 @@ import ua.diploma.projectmanager.dto.task.TaskDto;
 import ua.diploma.projectmanager.dto.task.TaskFullInfoDto;
 import ua.diploma.projectmanager.dto.task.TaskUpdateDto;
 import ua.diploma.projectmanager.dto.user.AssignUserDto;
+import ua.diploma.projectmanager.security.enums.AssignmentType;
 import ua.diploma.projectmanager.service.TaskService;
 import ua.diploma.projectmanager.service.UserService;
 
@@ -49,7 +50,11 @@ public class TaskController {
     @PostMapping("/assign")
     @PreAuthorize("hasRole('ADMIN') or (hasRole('MANAGER') and @userService.isUserAssignedToProjectByTask(#assignUserDto.id, authentication.principal.username))")
     public ResponseEntity<String> assignUserToTask(@RequestBody AssignUserDto assignUserDto) {
-        userService.assignUser(assignUserDto);
+        userService.assignUser(new AssignUserDto(
+                assignUserDto.getId(),
+                assignUserDto.getUserEmail(),
+                AssignmentType.TASK));
+
         return ResponseEntity.ok("User %s assigned to task %d successfully".formatted(
                 assignUserDto.getUserEmail(), assignUserDto.getId()
         ));
@@ -58,7 +63,11 @@ public class TaskController {
     @PostMapping("/unassign")
     @PreAuthorize("hasRole('ADMIN') or (hasRole('MANAGER') and @userService.isUserAssignedToProjectByTask(#assignUserDto.id, authentication.principal.username))")
     public ResponseEntity<String> unassignUserFromTask(@RequestBody AssignUserDto assignUserDto) {
-        userService.unassignUser(assignUserDto);
+        userService.unassignUser(new AssignUserDto(
+                assignUserDto.getId(),
+                assignUserDto.getUserEmail(),
+                AssignmentType.TASK));
+
         return ResponseEntity.ok("User %s unassigned from task %d successfully".formatted(
                 assignUserDto.getUserEmail(), assignUserDto.getId()
         ));
