@@ -1,5 +1,7 @@
 package ua.diploma.projectmanager.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,12 +25,18 @@ public class ProjectController {
     private final ProjectService projectService;
     private final UserService userService;
 
+    @Operation(summary = "Get project by ID")
+    @ApiResponse(responseCode = "200", description = "Project found")
+    @ApiResponse(responseCode = "404", description = "Project not found")
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or @userService.isUserAssignedToProject(#id, authentication.principal.username)")
     public ProjectFullInfoDto getProject(@PathVariable Long id) {
         return projectService.getProject(id);
     }
 
+    @Operation(summary = "Create new project")
+    @ApiResponse(responseCode = "201", description = "Project created")
+    @ApiResponse(responseCode = "400", description = "Invalid project data")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasAnyRole('MANAGER', 'ADMIN')")
@@ -37,18 +45,28 @@ public class ProjectController {
         return projectService.createProject(projectDto, authentication.getName());
     }
 
+    @Operation(summary = "Update existing project")
+    @ApiResponse(responseCode = "200", description = "Project updated")
+    @ApiResponse(responseCode = "400", description = "Invalid project data")
+    @ApiResponse(responseCode = "404", description = "Project not found")
     @PutMapping
     @PreAuthorize("(hasRole('ADMIN')) or (hasRole('MANAGER') and @userService.isUserAssignedToProject(#projectUpdateDto.id, authentication.principal.username))")
     public ProjectFullInfoDto updateProject(@Valid @RequestBody ProjectUpdateDto projectUpdateDto) {
         return projectService.updateProject(projectUpdateDto);
     }
 
+    @Operation(summary = "Delete project by ID")
+    @ApiResponse(responseCode = "200", description = "Project deleted")
+    @ApiResponse(responseCode = "404", description = "Project not found")
     @DeleteMapping("/{id}")
     @PreAuthorize("(hasRole('ADMIN')) or (hasRole('MANAGER') and @userService.isUserAssignedToProject(#id, authentication.principal.username))")
     public void deleteProject(@PathVariable Long id) {
         projectService.deleteProject(id);
     }
 
+    @Operation(summary = "Assign user to project")
+    @ApiResponse(responseCode = "200", description = "User assigned to project")
+    @ApiResponse(responseCode = "404", description = "User or project not found")
     @PostMapping("/assign")
     @PreAuthorize("(hasRole('ADMIN')) or (hasRole('MANAGER') and @userService.isUserAssignedToProject(#assignUserDto.id, authentication.principal.username))")
     public ResponseEntity<String> assignUserToProject(@RequestBody AssignUserDto assignUserDto) {
@@ -62,6 +80,9 @@ public class ProjectController {
         ));
     }
 
+    @Operation(summary = "Unassign user from project")
+    @ApiResponse(responseCode = "200", description = "User unassigned from project")
+    @ApiResponse(responseCode = "404", description = "User or project not found")
     @PostMapping("/unassign")
     @PreAuthorize("(hasRole('ADMIN')) or (hasRole('MANAGER') and @userService.isUserAssignedToProject(#assignUserDto.id, authentication.principal.username))")
     public ResponseEntity<String> unassignUserFromProject(@RequestBody AssignUserDto assignUserDto) {
