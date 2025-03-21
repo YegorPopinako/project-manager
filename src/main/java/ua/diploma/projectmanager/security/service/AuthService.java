@@ -3,12 +3,8 @@ package ua.diploma.projectmanager.security.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import ua.diploma.projectmanager.dto.user.SignInDto;
-import ua.diploma.projectmanager.dto.user.SignInResponseDto;
 import ua.diploma.projectmanager.dto.user.SignUpDto;
 import ua.diploma.projectmanager.dto.user.UserFullInfoDto;
 import ua.diploma.projectmanager.exception.EmailAlreadyInUseException;
@@ -24,8 +20,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
     private final PasswordEncoder passwordEncoder;
-    private final JWTService jwtService;
-    private final AuthenticationManager authenticationManager;
+    private final TokenRepository tokenRepository;
 
     @Transactional
     public UserFullInfoDto signUp(SignUpDto userDto) {
