@@ -43,11 +43,8 @@ public class AuthController {
                 .claim("authorities", createAuthorities(user))
                 .build();
         return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
+       return tokenService.generateToken(user);
     }
 
-    private String createAuthorities(User user) {
-        return user.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.joining(" "));
     }
 }

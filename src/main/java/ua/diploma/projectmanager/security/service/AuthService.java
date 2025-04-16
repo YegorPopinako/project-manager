@@ -20,7 +20,6 @@ public class AuthService {
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
     private final PasswordEncoder passwordEncoder;
-    private final TokenRepository tokenRepository;
 
     @Transactional
     public UserFullInfoDto signUp(SignUpDto userDto) {
@@ -31,12 +30,5 @@ public class AuthService {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRoles(Set.of(Role.USER));
         return modelMapper.map(userRepository.save(user), UserFullInfoDto.class);
-    }
-
-    public SignInResponseDto signIn(SignInDto signInDto) {
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                signInDto.getEmail(), signInDto.getPassword()
-        ));
-        return new SignInResponseDto(jwtService.generateToken(userRepository.findByEmail(signInDto.getEmail()).get()));
     }
 }
