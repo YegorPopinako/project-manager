@@ -15,11 +15,11 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationEntryPoint;
 import org.springframework.security.oauth2.server.resource.web.access.BearerTokenAccessDeniedHandler;
 import org.springframework.security.web.SecurityFilterChain;
+import ua.diploma.projectmanager.security.token.CustomJwtAuthenticationConverter;
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -35,20 +35,22 @@ import static org.springframework.security.config.Customizer.withDefaults;
 public class SecurityConfig {
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, CustomJwtAuthenticationConverter customConverter) throws Exception {
         http.authorizeHttpRequests(
                         request -> request
                                 .requestMatchers("/", "/doc", "/v3/api-docs/**",
                                         "/swagger-ui/**", "/swagger-ui.html",
                                         "/swagger-ui/index.html", "/static/**").permitAll()
                                 .requestMatchers("/register").permitAll()
-                                .requestMatchers("/api/**", "/user", "/admin", "/login").authenticated()
+                                .requestMatchers("/api/**", "/user", "/admin", "/login", "/ui/logout").authenticated()
                 ).sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf(AbstractHttpConfigurer::disable);
 
         http.httpBasic(withDefaults());
 
-        http.oauth2ResourceServer(o -> o.jwt(withDefaults()))
+        http.oauth2ResourceServer(o -> o
+                        .jwt(jwtConfigurer -> jwtConfigurer.jwtAuthenticationConverter(customConverter::convert))
+                )
                 .exceptionHandling(e -> e
                         .authenticationEntryPoint(new BearerTokenAuthenticationEntryPoint())
                         .accessDeniedHandler(new BearerTokenAccessDeniedHandler()));
@@ -76,13 +78,10 @@ public class SecurityConfig {
     }
 
     @Bean
-    public JwtAuthenticationConverter jwtAuthenticationConverter() {
+    public JwtGrantedAuthoritiesConverter jwtAuthenticationConverter() {
         JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
         grantedAuthoritiesConverter.setAuthorityPrefix("");
         grantedAuthoritiesConverter.setAuthoritiesClaimName("authorities");
-
-        JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
-        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter);
-        return jwtAuthenticationConverter;
+        return grantedAuthoritiesConverter;
     }
 }
