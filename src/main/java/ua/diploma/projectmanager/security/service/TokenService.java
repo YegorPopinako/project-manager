@@ -1,7 +1,6 @@
 package ua.diploma.projectmanager.security.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
@@ -11,7 +10,6 @@ import ua.diploma.projectmanager.redis.RedisRepository;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,7 +26,6 @@ public class TokenService {
                 .issuedAt(now)
                 .expiresAt(now.plus(TTL))
                 .subject(user.getUsername())
-                .claim("authorities", createAuthorities(user))
                 .build();
 
         String token = jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
@@ -42,11 +39,5 @@ public class TokenService {
 
     public void revokeToken(String username) {
         redisRepository.deleteToken(username);
-    }
-
-    private String createAuthorities(User user) {
-        return user.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.joining(" "));
     }
 }
