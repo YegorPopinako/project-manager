@@ -36,8 +36,6 @@ public class Task {
 
     private LocalDateTime createdAt;
 
-    private LocalDateTime startPoint;
-
     private LocalDateTime endPoint;
 
     private LocalDateTime updatedAt;

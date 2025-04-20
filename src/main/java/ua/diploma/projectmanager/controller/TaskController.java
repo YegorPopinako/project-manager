@@ -28,7 +28,7 @@ public class TaskController {
     @ApiResponse(responseCode = "200", description = "Task found")
     @ApiResponse(responseCode = "404", description = "Task not found")
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or @userService.isUserAssignedToProjectByTask(#id, authentication.principal.username)")
+    @PreAuthorize("@userService.isUserAssignedToProjectByTask(#id, authentication.name)")
     public TaskFullInfoDto getTask(@PathVariable Long id) {
         return taskService.getTask(id);
     }
@@ -38,7 +38,7 @@ public class TaskController {
     @ApiResponse(responseCode = "400", description = "Invalid task data")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("hasRole('ADMIN') or (hasAnyRole('MANAGER', 'DEV') and @userService.isUserAssignedToProjectByTask(#taskDto.projectId, authentication.principal.username))")
+    @PreAuthorize("@userService.isUserAssignedToProject(#taskDto.projectId, authentication.name)")
     public TaskFullInfoDto createTask(@Valid @RequestBody TaskDto taskDto) {
         return taskService.createTask(taskDto);
     }
@@ -48,7 +48,7 @@ public class TaskController {
     @ApiResponse(responseCode = "400", description = "Invalid task data")
     @ApiResponse(responseCode = "404", description = "Task not found")
     @PutMapping
-    @PreAuthorize("hasRole('ADMIN') or (hasRole('MANAGER') and @userService.isUserAssignedToProjectByTask(#taskUpdateDto.id, authentication.principal.username))")
+    @PreAuthorize("@userService.isUserAssignedToProjectByTask(#taskUpdateDto.id, authentication.name)")
     public TaskFullInfoDto updateTask(@Valid @RequestBody TaskUpdateDto taskUpdateDto) {
         return taskService.updateTask(taskUpdateDto);
     }
@@ -57,7 +57,7 @@ public class TaskController {
     @ApiResponse(responseCode = "200", description = "Task deleted")
     @ApiResponse(responseCode = "404", description = "Task not found")
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or (hasRole('MANAGER') and @userService.isUserAssignedToProjectByTask(#id, authentication.principal.username))")
+    @PreAuthorize("@userService.isUserAssignedToProjectByTask(#id, authentication.name)")
     public void deleteTask(@PathVariable Long id) {
         taskService.deleteTask(id);
     }
@@ -66,7 +66,7 @@ public class TaskController {
     @ApiResponse(responseCode = "200", description = "User assigned to task")
     @ApiResponse(responseCode = "404", description = "Task not found")
     @PostMapping("/assign")
-    @PreAuthorize("hasRole('ADMIN') or (hasRole('MANAGER') and @userService.isUserAssignedToProjectByTask(#assignUserDto.id, authentication.principal.username))")
+    @PreAuthorize("userService.isUserAssignedToProjectByTask(#assignUserDto.id, authentication.name)")
     public ResponseEntity<String> assignUserToTask(@RequestBody AssignUserDto assignUserDto) {
         userService.assignUser(new AssignUserDto(
                 assignUserDto.getId(),
@@ -82,7 +82,7 @@ public class TaskController {
     @ApiResponse(responseCode = "200", description = "User unassigned from task")
     @ApiResponse(responseCode = "404", description = "Task not found")
     @PostMapping("/unassign")
-    @PreAuthorize("hasRole('ADMIN') or (hasRole('MANAGER') and @userService.isUserAssignedToProjectByTask(#assignUserDto.id, authentication.principal.username))")
+    @PreAuthorize("@userService.isUserAssignedToProjectByTask(#assignUserDto.id, authentication.name)")
     public ResponseEntity<String> unassignUserFromTask(@RequestBody AssignUserDto assignUserDto) {
         userService.unassignUser(new AssignUserDto(
                 assignUserDto.getId(),
