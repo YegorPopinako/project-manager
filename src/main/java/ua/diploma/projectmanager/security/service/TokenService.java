@@ -17,7 +17,7 @@ public class TokenService {
 
     private final JwtEncoder jwtEncoder;
     private final RedisRepository redisRepository;
-    private static final Duration TTL = Duration.ofMinutes(5);
+    private final Duration TTL = Duration.ofMinutes(1);
 
     public String generateToken(User user) {
         var now = Instant.now();
@@ -29,7 +29,7 @@ public class TokenService {
                 .build();
 
         String token = jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
-        redisRepository.saveToken(user.getUsername(), TTL, token);
+        redisRepository.saveToken(user.getUsername(), token);
         return token;
     }
 

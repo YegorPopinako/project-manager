@@ -101,6 +101,15 @@ public class UserService {
         }
     }
 
+    @Transactional
+    public void registerIfAbsent(String email) {
+        if(!userRepository.existsByEmail(email)) {
+            User user = new User();
+            user.setEmail(email);
+            userRepository.save(user);
+        }
+    }
+
     public boolean isUserAdminOfProject(Long projectId, String email) {
         Long userId = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"))

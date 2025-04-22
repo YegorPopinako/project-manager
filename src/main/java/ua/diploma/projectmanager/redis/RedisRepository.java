@@ -4,8 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import redis.clients.jedis.Jedis;
 
-import java.time.Duration;
-
 @Repository
 @Slf4j
 public class RedisRepository {
@@ -16,8 +14,8 @@ public class RedisRepository {
         this.jedis = new Jedis("localhost", 6379);
     }
 
-    public void saveToken(String username, Duration TTL, String token) {
-        jedis.setex(username, TTL.getSeconds(), token);
+    public void saveToken(String username, String token) {
+        jedis.set(username, token);
     }
 
     public void deleteToken(String username) {

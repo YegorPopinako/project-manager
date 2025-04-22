@@ -26,8 +26,6 @@ import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.RSAPublicKey;
 
-import static org.springframework.security.config.Customizer.withDefaults;
-
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -35,25 +33,33 @@ import static org.springframework.security.config.Customizer.withDefaults;
 public class SecurityConfig {
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, CustomJwtAuthenticationConverter customConverter) throws Exception {
-        http.authorizeHttpRequests(
-                        request -> request
-                                .requestMatchers("/", "/doc", "/v3/api-docs/**",
-                                        "/swagger-ui/**", "/swagger-ui.html",
-                                        "/swagger-ui/index.html", "/static/**").permitAll()
-                                .requestMatchers("/register").permitAll()
-                                .requestMatchers("/api/**", "/user", "/admin", "/login", "/ui/logout").authenticated()
-                ).sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .csrf(AbstractHttpConfigurer::disable);
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, CustomJwtAuthenticationConverter customConverter,
+                                                   CustomOAuth2UserService customOAuth2UserService,
+                                                   OAuth2AuthenticationSuccessHandler oAuth2SuccessHandler,
+                                                   CookieBearerTokenResolver tokenResolver) throws Exception {
 
-        http.httpBasic(withDefaults());
-
-        http.oauth2ResourceServer(o -> o
-                        .jwt(jwtConfigurer -> jwtConfigurer.jwtAuthenticationConverter(customConverter::convert))
+        http.authorizeHttpRequests(requests -> requests
+                        .requestMatchers("/", "/doc", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/static/**").permitAll()
+                        .requestMatchers("/login", "/oauth2/**", "/logout.html").permitAll()
+                        .requestMatchers("/api/**", "/user", "/admin", "/ui/logout", "/home", "/classroom-auth", "/classroom/**").authenticated()
                 )
+                .csrf(AbstractHttpConfigurer::disable)
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
+                .oauth2ResourceServer(oauth2 -> oauth2
+                        .bearerTokenResolver(tokenResolver)
+                        .jwt(jwt -> jwt.jwtAuthenticationConverter(customConverter::convert))
+                )
+
+                .oauth2Login(oauth2 -> oauth2
+                        .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
+                        .successHandler(oAuth2SuccessHandler)
+                )
+
                 .exceptionHandling(e -> e
                         .authenticationEntryPoint(new BearerTokenAuthenticationEntryPoint())
-                        .accessDeniedHandler(new BearerTokenAccessDeniedHandler()));
+                        .accessDeniedHandler(new BearerTokenAccessDeniedHandler())
+                );
 
         return http.build();
     }
