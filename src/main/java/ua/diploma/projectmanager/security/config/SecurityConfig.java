@@ -40,8 +40,8 @@ public class SecurityConfig {
 
         http.authorizeHttpRequests(requests -> requests
                         .requestMatchers("/", "/doc", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/static/**").permitAll()
-                        .requestMatchers("/login", "/oauth2/**", "/logout.html").permitAll()
-                        .requestMatchers("/api/**", "/user", "/admin", "/ui/logout", "/home", "/classroom-auth", "/classroom/**").authenticated()
+                        .requestMatchers("/login", "/oauth2/**", "/logout.html", "/unauthorized").permitAll()
+                        .requestMatchers("/api/**", "/ui/logout", "/home", "/classroom-auth", "/classroom/**").authenticated()
                 )
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -57,7 +57,7 @@ public class SecurityConfig {
                 )
 
                 .exceptionHandling(e -> e
-                        .authenticationEntryPoint(new BearerTokenAuthenticationEntryPoint())
+                        .authenticationEntryPoint(customEntryPoint)
                         .accessDeniedHandler(new BearerTokenAccessDeniedHandler())
                 );
 
