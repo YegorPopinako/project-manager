@@ -102,10 +102,13 @@ public class UserService {
     }
 
     @Transactional
-    public void registerIfAbsent(String email) {
+    public void registerIfAbsent(String email, String firstName, String lastName, String profileImage) {
         if(!userRepository.existsByEmail(email)) {
             User user = new User();
             user.setEmail(email);
+            user.setFirstName(firstName);
+            user.setLastName(lastName);
+            user.setProfileImage(profileImage);
             userRepository.save(user);
         }
     }

@@ -11,12 +11,12 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
-import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationEntryPoint;
 import org.springframework.security.oauth2.server.resource.web.access.BearerTokenAccessDeniedHandler;
 import org.springframework.security.web.SecurityFilterChain;
 import ua.diploma.projectmanager.security.token.CustomJwtAuthenticationConverter;
@@ -36,7 +36,9 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http, CustomJwtAuthenticationConverter customConverter,
                                                    CustomOAuth2UserService customOAuth2UserService,
                                                    OAuth2AuthenticationSuccessHandler oAuth2SuccessHandler,
-                                                   CookieBearerTokenResolver tokenResolver) throws Exception {
+                                                   ClientRegistrationRepository clientRegistrationRepository,
+                                                   CookieBearerTokenResolver tokenResolver,
+                                                   CustomEntryPoint customEntryPoint) throws Exception {
 
         http.authorizeHttpRequests(requests -> requests
                         .requestMatchers("/", "/doc", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/static/**").permitAll()
@@ -52,6 +54,11 @@ public class SecurityConfig {
                 )
 
                 .oauth2Login(oauth2 -> oauth2
+                        .authorizationEndpoint(endpoint -> endpoint
+                                .authorizationRequestResolver(
+                                        new CustomAuthorizationRequestResolver(clientRegistrationRepository)
+                                )
+                        )
                         .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
                         .successHandler(oAuth2SuccessHandler)
                 )
