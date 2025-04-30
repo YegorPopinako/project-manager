@@ -17,7 +17,6 @@ import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
-import org.springframework.security.oauth2.server.resource.web.access.BearerTokenAccessDeniedHandler;
 import org.springframework.security.web.SecurityFilterChain;
 import ua.diploma.projectmanager.security.token.CustomJwtAuthenticationConverter;
 
@@ -38,11 +37,12 @@ public class SecurityConfig {
                                                    OAuth2AuthenticationSuccessHandler oAuth2SuccessHandler,
                                                    ClientRegistrationRepository clientRegistrationRepository,
                                                    CookieBearerTokenResolver tokenResolver,
-                                                   CustomEntryPoint customEntryPoint) throws Exception {
+                                                   CustomEntryPoint customEntryPoint,
+                                                   CustomAccessDeniedHandler accessDeniedHandler) throws Exception {
 
         http.authorizeHttpRequests(requests -> requests
                         .requestMatchers("/", "/doc", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/static/**").permitAll()
-                        .requestMatchers("/login", "/oauth2/**", "/logout.html", "/unauthorized").permitAll()
+                        .requestMatchers("/login", "/oauth2/**", "/logout.html", "/unauthorized", "/forbidden").permitAll()
                         .requestMatchers("/api/**", "/ui/logout", "/home", "/classroom-auth", "/classroom/**").authenticated()
                 )
                 .csrf(AbstractHttpConfigurer::disable)
@@ -65,7 +65,7 @@ public class SecurityConfig {
 
                 .exceptionHandling(e -> e
                         .authenticationEntryPoint(customEntryPoint)
-                        .accessDeniedHandler(new BearerTokenAccessDeniedHandler())
+                        .accessDeniedHandler(accessDeniedHandler)
                 );
 
         return http.build();

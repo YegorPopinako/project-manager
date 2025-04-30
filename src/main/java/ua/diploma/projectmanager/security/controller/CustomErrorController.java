@@ -11,4 +11,9 @@ public class CustomErrorController implements ErrorController {
     public String unauthorized() {
         return "401";
     }
+
+    @GetMapping("/forbidden")
+    public String accessDenied() {
+        return "403";
+    }
 }
