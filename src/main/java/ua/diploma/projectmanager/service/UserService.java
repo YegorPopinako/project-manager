@@ -7,10 +7,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import ua.diploma.projectmanager.dto.project.ProjectFullInfoDto;
 import ua.diploma.projectmanager.dto.user.AssignUserDto;
 import ua.diploma.projectmanager.dto.user.UserFullInfoDto;
 import ua.diploma.projectmanager.dto.user.UserUpdateDto;
-import ua.diploma.projectmanager.exception.EmailAlreadyInUseException;
 import ua.diploma.projectmanager.model.Project;
 import ua.diploma.projectmanager.model.Task;
 import ua.diploma.projectmanager.model.User;
@@ -23,6 +23,7 @@ import ua.diploma.projectmanager.security.enums.AssignmentType;
 import ua.diploma.projectmanager.security.enums.Role;
 import ua.diploma.projectmanager.service.mapper.UserMapper;
 
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -37,9 +38,9 @@ public class UserService {
     private final UserMapper userMapper;
     private final UserProjectRepository userProjectRepository;
 
-    public UserFullInfoDto getUser(Long id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("User with id " + id + " not found"));
+    public UserFullInfoDto getUser(String username) {
+        User user = userRepository.findByEmail(username)
+                .orElseThrow(() -> new EntityNotFoundException("User with email " + username + " not found"));
         return modelMapper.map(user, UserFullInfoDto.class);
     }
 
@@ -48,25 +49,17 @@ public class UserService {
         var user = userRepository.findById(userDto.getId())
                 .orElseThrow(() -> new EntityNotFoundException("User with id: %s not found".formatted(userDto.getId())));
 
-        if (userRepository.existsByEmailAndIdNot(userDto.getEmail(), userDto.getId())) {
-            throw new EmailAlreadyInUseException("Email already in use");
-        }
-
         userMapper.mapUserFromUserDto(userDto, user);
+
+        user.setDisplayName(user.getFirstName() + " " + user.getLastName());
 
         return modelMapper.map(userRepository.save(user), UserFullInfoDto.class);
     }
 
     @Transactional
-    public void deleteUser(Long id) {
-        getUser(id);
-        userRepository.deleteById(id);
-    }
-
-    @Transactional
     public void assignUser(AssignUserDto dto) {
         User user = userRepository.findByEmail(dto.getUserEmail())
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+                .orElseThrow(() -> new EntityNotFoundException("User is not registered in a system"));
 
         Object entity = getEntityByType(dto.getType(), dto.getId());
 
@@ -94,6 +87,7 @@ public class UserService {
 
         if (entity instanceof Project project) {
             userProjectRepository.deleteByUserIdAndProjectId(user.getId(), project.getId());
+            taskRepository.unassignUserFromTasksInProject(project.getId(), user.getId());
         } else if (entity instanceof Task task) {
             validateTaskUnassignment(task, user);
             task.setUser(null);
@@ -111,6 +105,14 @@ public class UserService {
             user.setProfileImage(profileImage);
             userRepository.save(user);
         }
+    }
+
+    public List<ProjectFullInfoDto> getUserProjects(String name) {
+        User user = userRepository.findByEmail(name).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        return userProjectRepository.findProjectsByUserId(user.getId())
+                .stream()
+                .map(project -> modelMapper.map(project, ProjectFullInfoDto.class))
+                .toList();
     }
 
     public boolean isUserAdminOfProject(Long projectId, String email) {
