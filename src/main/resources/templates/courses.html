@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Google Classroom Courses</title>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: #f8f9fa;
+            padding: 2rem;
+        }
+        h1 {
+            color: #343a40;
+        }
+        .course-list {
+            list-style: none;
+            padding: 0;
+        }
+        .course-item {
+            background-color: #ffffff;
+            border: 1px solid #dee2e6;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+        }
+        .course-item a {
+            text-decoration: none;
+            color: #007bff;
+            font-weight: bold;
+        }
+        .course-item a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Your Google Classroom Courses</h1>
+
+<ul class="course-list">
+    <li th:each="course : ${courses}" class="course-item">
+        <a th:href="@{'/classroom/coursework/' + ${course.id}}"
+           th:text="${course.name}">Course Name</a>
+        <p th:text="'Section: ' + ${course.section}"></p>
+    </li>
+</ul>
+
+<p th:if="${#lists.isEmpty(courses)}">No courses available.</p>
+
+</body>
+</html>

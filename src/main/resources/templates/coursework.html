@@ -1,0 +1,112 @@
+<!-- coursework.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Coursework</title>
+</head>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f6f8;
+        color: #333;
+        margin: 0;
+        padding: 20px;
+    }
+
+    h1 {
+        color: #2c3e50;
+    }
+
+    ul {
+        list-style-type: none;
+        padding: 0;
+    }
+
+    li {
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    strong {
+        font-size: 18px;
+        display: block;
+        margin-bottom: 8px;
+        color: #0077cc;
+    }
+
+    .due-date {
+        color: #e74c3c;
+        font-weight: bold;
+    }
+
+    .no-deadline {
+        color: #7f8c8d;
+        font-style: italic;
+    }
+
+    a.button {
+        display: inline-block;
+        margin-top: 10px;
+        padding: 8px 12px;
+        background-color: #3498db;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        transition: background-color 0.3s ease;
+    }
+
+    a.button:hover {
+        background-color: #2980b9;
+    }
+
+    .back-link {
+        display: inline-block;
+        margin-top: 30px;
+        text-decoration: none;
+        color: #3498db;
+    }
+</style>
+<body>
+
+<h1 th:text="'Coursework for: ' + ${courseTitle}"></h1>
+
+<ul>
+    <li th:each="work : ${courseworks}">
+        <strong th:text="${work.title}">Title</strong>
+
+        <div th:if="${work.dueDate != null}">
+            <span class="due-date">Due: </span>
+            <span class="due-date" th:text="${work.dueDate.year} + '-' + ${work.dueDate.month} + '-' + ${work.dueDate.day}"></span>
+        </div>
+        <div th:if="${work.dueDate == null}" class="no-deadline">Без дедлайну</div>
+
+        <!-- Button to Google Classroom task -->
+        <div th:if="${work.alternateLink != null}">
+            <a th:href="${work.alternateLink}" target="_blank" class="button">Open in Google Classroom</a>
+        </div>
+
+        <hr/>
+    </li>
+</ul>
+
+<h2>Course Materials</h2>
+<ul>
+    <li th:each="mat : ${materials}">
+        <strong th:text="${mat.title}">Material Title</strong>
+        <div th:if="${mat.alternateLink != null}">
+            <a th:href="${mat.alternateLink}" target="_blank" class="button">View Material</a>
+        </div>
+        <hr/>
+    </li>
+</ul>
+
+
+<a href="/home" class="back-link">⬅ Back to Home</a>
+
+</body>
+</html>

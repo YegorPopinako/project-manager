@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Profile</title>
+</head>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 40px;
+        background-color: #f9f9f9;
+    }
+
+    .profile-page {
+        margin-top: 40px;
+        display: flex;
+        gap: 40px;
+        align-items: flex-start;
+        max-width: 900px;
+    }
+
+    .profile-image {
+        width: 250px;
+        height: 250px;
+        border-radius: 50%;
+        object-fit: cover;
+        background-color: #eee;
+        flex-shrink: 0;
+    }
+
+    .profile-form {
+        margin-top: 40px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .form-row {
+        display: flex;
+        gap: 20px;
+    }
+
+    .form-row .form-group {
+        flex: 1;
+    }
+
+    label {
+        font-size: 14px;
+        color: #555;
+        margin-bottom: 4px;
+    }
+
+    input[type="text"] {
+        padding: 10px 15px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-size: 16px;
+    }
+
+    input[readonly] {
+        background-color: #f0f0f0;
+    }
+
+    button[type="submit"] {
+        background-color: #007bff;
+        color: white;
+        padding: 12px;
+        font-size: 16px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        display: none; /* hidden by default */
+    }
+
+    button[type="submit"]:hover {
+        background-color: #0056b3;
+    }
+</style>
+<body>
+
+<div th:insert="fragments/navbar :: navbar(${notifications})"></div>
+
+<div class="profile-page">
+    <img th:src="@{${userDto.profileImage}}" alt="Profile Image" class="profile-image">
+
+    <form th:action="@{/api/user}" th:object="${userDto}" method="post" class="profile-form" id="profileForm">
+        <input type="hidden" name="_method" value="put"/>
+        <input type="hidden" th:field="*{id}"/>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="firstName">First Name</label>
+                <input type="text" th:field="*{firstName}" id="firstName" />
+            </div>
+
+            <div class="form-group">
+                <label for="lastName">Last Name</label>
+                <input type="text" th:field="*{lastName}" id="lastName" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="displayName">Display Name</label>
+            <input type="text" th:field="*{displayName}" id="displayName" readonly />
+        </div>
+
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="text" th:field="*{email}" id="email" readonly />
+        </div>
+
+        <button type="submit" id="updateButton">Update Profile</button>
+    </form>
+</div>
+</body>
+</html>
+
+<script>
+    const form = document.getElementById('profileForm');
+    const updateButton = document.getElementById('updateButton');
+    const initialData = {
+        firstName: form.querySelector('#firstName').value,
+        lastName: form.querySelector('#lastName').value
+    };
+
+    form.addEventListener('input', () => {
+        const currentFirstName = form.querySelector('#firstName').value;
+        const currentLastName = form.querySelector('#lastName').value;
+
+        if (currentFirstName !== initialData.firstName || currentLastName !== initialData.lastName) {
+            updateButton.style.display = 'block';
+        } else {
+            updateButton.style.display = 'none';
+        }
+    });
+</script>
