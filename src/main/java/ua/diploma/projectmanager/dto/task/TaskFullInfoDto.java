@@ -2,8 +2,11 @@ package ua.diploma.projectmanager.dto.task;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ua.diploma.projectmanager.dto.project.ProjectFullInfoDto;
+import ua.diploma.projectmanager.model.Project;
+import ua.diploma.projectmanager.model.User;
+import ua.diploma.projectmanager.security.enums.TaskStatus;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -16,16 +19,13 @@ public class TaskFullInfoDto {
 
     private String description;
 
-    private String status;
+    private TaskStatus status;
 
-    private Integer estimate;
-
-    private LocalDateTime startPoint;
-
-    private LocalDateTime endPoint;
+    private LocalDate endPoint;
 
     private LocalDateTime updatedAt;
 
-    private ProjectFullInfoDto project;
-}
+    private User user;
 
+    private Project project;
+}
