@@ -13,7 +13,9 @@ import ua.diploma.projectmanager.repository.ProjectRepository;
 import ua.diploma.projectmanager.repository.TaskRepository;
 import ua.diploma.projectmanager.service.mapper.TaskMapper;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -30,14 +32,22 @@ public class TaskService {
         return modelMapper.map(task, TaskFullInfoDto.class);
     }
 
+    public List<TaskFullInfoDto> findByEndPoint(LocalDate tomorrow) {
+        return taskRepository.findByEndPoint(tomorrow)
+                .stream()
+                .filter(task -> task.getUser() != null)
+                .map(task -> modelMapper.map(task, TaskFullInfoDto.class))
+                .toList();
+    }
+
     @Transactional
     public TaskFullInfoDto createTask(TaskDto taskDto) {
         Task task = new Task();
         task.setTitle(taskDto.getTitle());
         task.setDescription(taskDto.getDescription());
         task.setStatus(taskDto.getStatus());
-        task.setEstimate(taskDto.getEstimate());
         task.setCreatedAt(LocalDateTime.now());
+        task.setEndPoint(taskDto.getEndPoint());
         task.setProject(projectRepository.findById(taskDto.getProjectId()).orElseThrow(() ->
                 new EntityNotFoundException("Project not found")));
         return modelMapper.map(taskRepository.save(task), TaskFullInfoDto.class);

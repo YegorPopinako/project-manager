@@ -14,6 +14,7 @@ import ua.diploma.projectmanager.model.User;
 import ua.diploma.projectmanager.model.UserProject;
 import ua.diploma.projectmanager.model.UserProjectId;
 import ua.diploma.projectmanager.repository.ProjectRepository;
+import ua.diploma.projectmanager.repository.TaskRepository;
 import ua.diploma.projectmanager.repository.UserProjectRepository;
 import ua.diploma.projectmanager.repository.UserRepository;
 import ua.diploma.projectmanager.security.enums.Role;
@@ -28,6 +29,7 @@ public class ProjectService {
     private final ProjectMapper projectMapper;
     private final UserRepository userRepository;
     private final UserProjectRepository userProjectRepository;
+    private final TaskRepository taskRepository;
 
     public ProjectFullInfoDto getProject(Long id) {
         Project project = projectRepository.findById(id)
@@ -67,7 +69,8 @@ public class ProjectService {
 
     @Transactional
     public void deleteProject(Long id) {
-        userProjectRepository.deleteProjectById(id);
+        taskRepository.deleteByProjectId(id);
+        userProjectRepository.deleteByProjectId(id);
         projectRepository.deleteById(id);
     }
 }
