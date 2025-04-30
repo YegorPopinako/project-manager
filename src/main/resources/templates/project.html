@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Project Page</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f4f5f7;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1, h2 {
+            color: #172b4d;
+        }
+
+        .project-page-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 40px;
+            margin: 40px;
+        }
+
+        .project-left {
+            flex: 2;
+        }
+
+        .project-right {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: flex-start;
+        }
+
+        .user-list-container {
+            width: 100%;
+        }
+
+        .user-list {
+            max-height: 180px;
+            overflow-y: auto;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #fafafa;
+        }
+
+        .user-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+
+        .profile-img {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .project-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .update-btn,
+        .delete-btn,
+        .back-btn {
+            padding: 8px 12px;
+            font-size: 14px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: center;
+            display: inline-block;
+        }
+
+        .update-btn {
+            background-color: #2196f3;
+            color: white;
+        }
+
+        .delete-btn {
+            background-color: #f44336;
+            color: white;
+        }
+
+        .delete-btn-container {
+            display: inline-block;
+            margin-left: 10px;
+        }
+
+        .delete-user-btn {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            padding: 6px;
+            font-size: 18px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+        }
+
+        .modal-buttons {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .modal-button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .modal-button.delete {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .modal-button.update {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .modal-button:hover {
+            opacity: 0.8;
+        }
+
+        .delete-user-btn:hover {
+            background-color: #e53935;
+        }
+
+        .back-btn {
+            background-color: #e0e0e0;
+            color: black;
+            text-decoration: none;
+            display: block;
+        }
+
+        .invite-button {
+            background-color: #0052cc;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .invite-button:hover {
+            background-color: #0747a6;
+        }
+
+        .kanban-board {
+            display: flex;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .kanban-column {
+            background: #ebecf0;
+            border-radius: 8px;
+            padding: 10px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .kanban-column h3 {
+            text-align: center;
+            color: #344563;
+        }
+
+        .task-card {
+            background: white;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: transform 0.1s ease;
+        }
+
+        .task-card:hover {
+            transform: scale(1.02);
+        }
+
+        .task-title {
+            font-weight: bold;
+            color: #172b4d;
+        }
+
+        .task-desc {
+            font-size: 0.9em;
+            color: #5e6c84;
+            margin: 5px 0;
+        }
+
+        .task-meta {
+            font-size: 0.8em;
+            color: #6b778c;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 100;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 400px;
+            max-width: 90%;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 18px;
+            cursor: pointer;
+            color: #333;
+        }
+
+        .modal-content h3 {
+            margin-top: 0;
+            color: #172b4d;
+        }
+
+        .modal-content p {
+            color: #4c4c4c;
+            margin: 8px 0;
+        }
+
+        /* Button to open modal */
+        .open-add-task-btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .open-add-task-btn:hover {
+            background-color: #45a049;
+        }
+
+        /* Modal styling */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            padding: 20px;
+            border-radius: 8px;
+            width: 400px;
+            max-width: 90%;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-content form div {
+            margin-bottom: 15px;
+        }
+
+        .modal-content form input, .modal-content form textarea {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+
+        .close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: red;
+        }
+
+        .add-task-submit-btn {
+            background-color: #008CBA;
+            color: white;
+            padding: 10px 20px;
+            margin-top: 15px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .add-task-submit-btn:hover {
+            background-color: #007bb5;
+        }
+
+        /* Success Message Modal */
+        .success-content {
+            background-color: #dff0d8;
+            color: #3c763d;
+            text-align: center;
+            animation: pop 0.5s ease forwards;
+        }
+
+        @keyframes pop {
+            0% {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div th:insert="fragments/navbar :: navbar(${notifications})"></div>
+
+<div class="project-page-container">
+    <!-- LEFT SIDE -->
+    <div class="project-left">
+        <h1>Project: <span th:text="${projectDto.title}"></span></h1>
+        <h2>Description: <span th:text="${projectDto.description}"></span></h2>
+
+        <a th:href="@{'/api/project/invite'(projectId=${projectDto.id})}">
+            <button class="invite-button">Invite User</button>
+        </a>
+    </div>
+
+    <!-- RIGHT SIDE -->
+    <div class="project-right">
+        <div class="user-list-container">
+            <h3>Team Members</h3>
+            <div class="user-list">
+                <div th:each="user : ${users}" class="user-item"
+                     th:title="${user.firstName + ' ' + user.lastName + ' (' + user.email + ')'}">
+                    <img th:src="${user.profileImage}" alt="Profile" class="profile-img"/>
+                    <span th:text="${user.displayName}"></span>
+
+                    <div th:if="${isOwner && user.email != authentication.name}" class="delete-btn-container">
+                        <form th:action="@{/api/project/unassign}" th:object="${assignUserDto}" method="post">
+                            <input type="hidden" name="id" th:value="${projectDto.id}"/>
+                            <input type="hidden" name="userEmail" th:value="${user.email}"/>
+                            <input type="hidden" name="type" value="PROJECT"/>
+                            <button type="submit" class="delete-user-btn">X</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="project-actions" th:if="${isOwner}">
+            <button class="update-btn" onclick="openUpdateModal()">Update Project</button>
+
+            <form th:action="@{'/api/project/' + ${projectDto.id}}" method="post"
+                  onsubmit="return confirm('Are you sure you want to delete this project?')">
+                <input type="hidden" name="_method" value="delete"/>
+                <button type="submit" class="delete-btn">Delete Project</button>
+            </form>
+        </div>
+
+        <a href="/home" class="back-btn">← Back to Home</a>
+    </div>
+</div>
+
+<div class="modal" id="updateModal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeUpdateModal()">&times;</span>
+        <h2>Update Project</h2>
+
+        <form th:action="@{/api/project}" method="post" th:object="${projectUpdateDto}">
+            <input type="hidden" name="_method" value="put"/>
+            <input type="hidden" th:field="*{id}"/>
+
+            <input type="text" th:field="*{title}" placeholder="Project Title" required/>
+            <input type="text" th:field="*{description}" placeholder="Project Description" required/>
+
+            <button type="submit">Update</button>
+        </form>
+    </div>
+</div>
+
+<!-- Add Task Button -->
+<button onclick="openAddTaskModal()" class="open-add-task-btn">Add Task</button>
+
+<!-- Add Task Modal -->
+<div id="addTaskModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeAddTaskModal()">&times;</span>
+
+        <h3>Add New Task</h3>
+        <form id="addTaskForm" th:action="@{/api/task}" method="post">
+            <input type="hidden" name="projectId" th:value="${projectDto.id}"/>
+
+            <div>
+                <label for="title">Title:</label>
+                <input type="text" id="title" name="title" required minlength="3" maxlength="255"/>
+            </div>
+
+            <div>
+                <label for="description">Description:</label>
+                <textarea id="description" name="description" required minlength="3" maxlength="255"></textarea>
+            </div>
+
+            <div>
+                <label for="status">Status:</label>
+                <select id="status" name="status" required>
+                    <option value="TODO">TODO</option>
+                    <option value="IN_PROGRESS">IN PROGRESS</option>
+                    <option value="DONE">DONE</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="endPoint">End Point:</label>
+                <input type="date" id="endPoint" name="endPoint" required/>
+            </div>
+
+            <button type="submit" class="add-task-submit-btn">Create Task</button>
+        </form>
+    </div>
+</div>
+
+<!-- Success Message Modal -->
+<div id="successModal" class="modal">
+    <div class="modal-content success-content">
+        <h2>🎉 Task Created!</h2>
+    </div>
+</div>
+
+<!-- Kanban-style Task Board -->
+<div class="kanban-board">
+    <div th:each="status : ${T(ua.diploma.projectmanager.security.enums.TaskStatus).values()}" class="kanban-column">
+        <h3 th:text="${status}">Status</h3>
+        <div th:each="task : ${projectDto.tasks}" th:if="${task.status == status}" class="task-card"
+             th:attr="data-id=${task.id},
+              data-project-id=${task.project.id},
+              data-status=${task.status},
+              data-title=${task.title},
+              data-description=${task.description},
+              data-user=${task.user != null ? task.user.getEmail() : 'Unassigned'},
+              data-end=${#temporals.format(task.endPoint, 'yyyy-MM-dd')}">
+            <div class="task-title" th:text="${task.title}"></div>
+            <div class="task-desc" th:text="${task.description}"></div>
+            <div class="task-meta">
+                Assigned to: <span th:text="${task.user != null ? task.user.getDisplayName() : 'Unassigned'}"></span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="taskModal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeTaskModal()">&times;</span>
+        <h3 id="modalTitle"></h3>
+        <p><strong>Description:</strong> <span id="modalDescription"></span></p>
+        <p><strong>Assigned to:</strong> <span id="modalUser"></span></p>
+        <p><strong>End:</strong> <span id="modalEnd"></span></p>
+
+        <div id="assignButtonContainer" style="display: none; margin-top: 15px;">
+            <form th:action="@{/api/task/assign}" method="post">
+                <input type="hidden" name="id" id="assignTaskId" />
+                <input type="hidden" name="type" value="TASK" />
+                <select name="userEmail" id="assignUserSelect">
+                    <option th:each="user : ${users}"
+                            th:value="${user.email}"
+                            th:text="${user.displayName}">
+                    </option>
+                </select>
+                <button type="submit" class="modal-button assign">Assign</button>
+            </form>
+        </div>
+
+        <div id="unassignButtonContainer" th:if="${isOwner}" style="margin-top: 15px;">
+            <form th:action="@{/api/task/unassign}" method="post">
+                <input type="hidden" name="id" id="unassignTaskId" />
+                <input type="hidden" name="userEmail" id="unassignUserEmail" />
+                <input type="hidden" name="type" value="TASK" />
+                <button type="submit" class="modal-button unassign">Unassign</button>
+            </form>
+        </div>
+
+        <!-- Buttons container -->
+        <div class="modal-buttons">
+            <button id="deleteTaskButton" class="modal-button delete">Delete Task</button>
+            <button id="openUpdateTaskButton" class="modal-button update">Update Task</button>
+        </div>
+    </div>
+</div>
+
+<!-- Update Task Modal -->
+<div class="modal" id="updateTaskModal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeUpdateTaskModal()">&times;</span>
+        <h3>Update Task</h3>
+        <form id="updateTaskForm" th:action="@{/api/task}" method="post">
+            <input type="hidden" name="_method" value="put"/>
+            <input type="hidden" id="updateTaskId" name="id">
+            <input type="hidden" id="updateProjectId" name="projectId">
+            <input type="hidden" id="updateStatus" name="status">
+
+            <div>
+                <label for="updateTitle">Title:</label>
+                <input type="text" id="updateTitle" name="title" required>
+            </div>
+
+            <div>
+                <label for="updateDescription">Description:</label>
+                <textarea id="updateDescription" name="description" required></textarea>
+            </div>
+
+            <div>
+                <label for="updateEndPoint">End Date:</label>
+                <input type="date" id="updateEndPoint" name="endPoint" required>
+            </div>
+
+            <button type="submit" class="modal-button update">Save Changes</button>
+        </form>
+    </div>
+</div>
+
+<script>
+
+    document.querySelectorAll('.task-card').forEach(card => {
+        card.setAttribute('draggable', 'true');
+
+        card.addEventListener('dragstart', (e) => {
+            e.dataTransfer.setData('text/plain', card.dataset.id);
+        });
+    });
+
+    document.querySelectorAll('.kanban-column').forEach(column => {
+        column.addEventListener('dragover', (e) => {
+            e.preventDefault();
+        });
+
+        column.addEventListener('drop', (e) => {
+            e.preventDefault();
+            const taskId = e.dataTransfer.getData('text/plain');
+            const newStatus = column.querySelector('h3').textContent.trim();
+
+            fetch('/api/task/status', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ taskId: taskId, newStatus: newStatus })
+            })
+                .then(response => {
+                    if (response.ok) {
+                        const card = document.querySelector(`.task-card[data-id="${taskId}"]`);
+                        column.appendChild(card);
+                        card.dataset.status = newStatus;
+                    } else {
+                        console.error('Failed to update task status');
+                    }
+                });
+        });
+    });
+
+    const addTaskModal = document.getElementById('addTaskModal');
+    const successModal = document.getElementById('successModal');
+    const addTaskForm = document.getElementById('addTaskForm');
+    const endPointInput = document.getElementById('endPoint');
+
+    function openAddTaskModal() {
+        addTaskModal.style.display = 'flex';
+    }
+
+    function closeAddTaskModal() {
+        addTaskModal.style.display = 'none';
+    }
+
+    window.addEventListener('click', function (e) {
+        if (e.target === addTaskModal) {
+            closeAddTaskModal();
+        }
+    });
+
+    const today = new Date();
+    today.setDate(today.getDate() + 1);
+    const minDate = today.toISOString().split('T')[0];
+    endPointInput.setAttribute('min', minDate);
+
+    addTaskForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        closeAddTaskModal();
+
+        successModal.style.display = 'flex';
+        setTimeout(() => {
+            successModal.style.display = 'none';
+            addTaskForm.submit();
+        }, 1500);
+    });
+
+    window.addEventListener('click', function (e) {
+        if (e.target === successModal) {
+            successModal.style.display = 'none';
+        }
+    });
+
+    const updateModal = document.getElementById('updateModal');
+
+    function openUpdateModal() {
+        updateModal.style.display = 'flex';
+    }
+
+    function closeUpdateModal() {
+        updateModal.style.display = 'none';
+    }
+
+    window.addEventListener('click', function (e) {
+        if (e.target === updateModal) {
+            closeUpdateModal();
+        }
+    });
+
+    const modal = document.getElementById('taskModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalDesc = document.getElementById('modalDescription');
+    const modalUser = document.getElementById('modalUser');
+    const modalEnd = document.getElementById('modalEnd');
+    const deleteTaskButton = document.getElementById('deleteTaskButton');
+
+    let currentTaskId = null;
+    let currentProjectId = null;
+    let currentStatus = null;
+
+    document.querySelectorAll('.task-card').forEach(card => {
+        card.addEventListener('click', () => {
+            modalTitle.textContent = card.dataset.title;
+            modalDesc.textContent = card.dataset.description;
+            modalUser.textContent = card.dataset.user;
+            modalEnd.textContent = card.dataset.end;
+            currentTaskId = card.dataset.id;
+            currentProjectId = card.dataset.projectId;
+            currentStatus = card.dataset.status;
+            modal.style.display = 'flex';
+
+            const assignButtonContainer = document.getElementById('assignButtonContainer');
+            const unassignButtonContainer = document.getElementById('unassignButtonContainer');
+            const assignTaskIdInput = document.getElementById('assignTaskId');
+            const unassignTaskIdInput = document.getElementById('unassignTaskId');
+            const unassignUserEmailInput = document.getElementById('unassignUserEmail');
+
+            const isAssigned = card.dataset.user && card.dataset.user !== 'Unassigned';
+
+            if (!isAssigned) {
+                assignButtonContainer.style.display = 'block';
+                assignTaskIdInput.value = currentTaskId;
+            } else {
+                assignButtonContainer.style.display = 'none';
+            }
+
+            if (unassignButtonContainer) {
+                if (isAssigned) {
+                    unassignButtonContainer.style.display = 'block';
+                    unassignTaskIdInput.value = currentTaskId;
+                    unassignUserEmailInput.value = card.dataset.user;
+                } else {
+                    unassignButtonContainer.style.display = 'none';
+                }
+            }
+        });
+    });
+
+    const updateTaskModal = document.getElementById('updateTaskModal');
+
+    function closeUpdateTaskModal() {
+        updateTaskModal.style.display = 'none';
+    }
+
+    document.getElementById('openUpdateTaskButton').addEventListener('click', () => {
+        updateTaskModal.style.display = 'flex';
+
+        document.getElementById('updateTaskId').value = currentTaskId;
+        document.getElementById('updateProjectId').value = currentProjectId;
+        document.getElementById('updateStatus').value = currentStatus;
+        document.getElementById('updateTitle').value = modalTitle.textContent;
+        document.getElementById('updateDescription').value = modalDesc.textContent;
+        document.getElementById('updateEndPoint').value = modalEnd.textContent;
+    });
+
+    window.onclick = function (event) {
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        } else if (event.target === updateTaskModal) {
+            updateTaskModal.style.display = 'none';
+        }
+    }
+
+    deleteTaskButton.addEventListener('click', () => {
+        if (currentTaskId) {
+            if (confirm("Are you sure you want to delete this task?")) {
+                fetch(`/api/task/${currentTaskId}`, {
+                    method: 'DELETE'
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            location.reload();
+                        } else {
+                            alert("Check your permissions.");
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error deleting task:', error);
+                        alert("Error deleting task.");
+                    });
+            }
+        }
+    });
+
+    function closeTaskModal() {
+        modal.style.display = 'none';
+    }
+
+    window.onclick = function (event) {
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    }
+</script>
+</body>
+</html>
