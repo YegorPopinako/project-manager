@@ -6,53 +6,60 @@
     <style>
         body {
             margin: 0;
-            font-family: Arial, sans-serif;
+            font-family: 'Roboto', sans-serif;
             display: flex;
-            flex-direction: column; /* Stack children vertically */
+            flex-direction: column;
             min-height: 100vh;
+            background-color: #f0f2f5;
         }
 
-        .sidebar {
-            width: 250px;
-            background-color: #f4f4f4;
-            padding: 20px;
-            height: 100vh;
-            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
+        .page {
+            display: flex;
+            flex: 1;
+            gap: 40px;
+            align-items: flex-start;
+            padding: 40px;
         }
 
         .main-content {
             flex: 1;
             padding: 20px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.05);
         }
 
-        .project-link {
-            display: block;
-            margin: 10px 0;
-            text-decoration: none;
-            color: #333;
-        }
-
-        .project-link:hover {
-            text-decoration: underline;
-        }
-
-        .create-btn {
+        .create-btn, .logout-btn, .classroom-btn {
             display: inline-block;
-            margin-bottom: 15px;
-            padding: 10px;
+            margin: 10px 5px 0 0;
+            padding: 10px 15px;
             background-color: #0052cc;
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 6px;
             text-align: center;
-            font-weight: bold;
+            font-weight: 500;
             cursor: pointer;
-            width: 100%;
+            transition: background-color 0.2s;
+            text-decoration: none;
         }
 
-        .create-btn:hover {
+        .create-btn:hover,
+        .logout-btn:hover,
+        .classroom-btn:hover {
             background-color: #0747a6;
+        }
+
+        .top-actions {
+            margin-top: 20px;
+        }
+
+        h1 {
+            margin-bottom: 0;
+        }
+
+        .welcome-msg {
+            color: #444;
         }
 
         /* Modal Styles */
@@ -110,13 +117,56 @@
             background-color: #0747a6;
         }
 
-        .page {
-            display: flex;
-            flex: 1;
-            gap: 40px;
-            align-items: flex-start;
-            padding: 40px;
+        .project-section {
+            margin-top: 40px;
         }
+
+        .project-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .project-card {
+            display: flex;
+            flex-direction: column;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            overflow: hidden;
+            text-decoration: none;
+            color: inherit;
+            transition: transform 0.2s, box-shadow 0.2s;
+            max-width: 100%;
+        }
+
+        .project-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+        }
+
+        .project-card-header {
+            padding: 10px 14px;
+            font-weight: bold;
+            font-size: 1rem; /* Keep it readable, but a bit smaller */
+            color: white;
+            background: linear-gradient(to right, var(--gradColorStart), var(--gradColorEnd));
+        }
+
+        .project-card-body {
+            padding: 14px;
+            font-size: 0.9rem;
+            color: #333;
+        }
+
+        /* Gradient color variants */
+        .project-card:nth-child(1) { --gradColorStart: #ff7e5f; --gradColorEnd: #feb47b; }
+        .project-card:nth-child(2) { --gradColorStart: #6a11cb; --gradColorEnd: #2575fc; }
+        .project-card:nth-child(3) { --gradColorStart: #43cea2; --gradColorEnd: #185a9d; }
+        .project-card:nth-child(4) { --gradColorStart: #f7971e; --gradColorEnd: #ffd200; }
+        .project-card:nth-child(5) { --gradColorStart: #ee0979; --gradColorEnd: #ff6a00; }
+
     </style>
 </head>
 <body>
@@ -124,19 +174,27 @@
 <div th:insert="fragments/navbar :: navbar(${notifications})"></div>
 
 <div class="page">
-    <div class="sidebar">
-        <h3>Your Projects</h3>
-        <button class="create-btn" onclick="openModal()">+ Create Project</button>
-
-        <div th:each="project : ${projects}">
-            <a th:href="@{'/api/project/' + ${project.id}}" th:text="${project.title}" class="project-link"></a>
-        </div>
-    </div>
-
     <div class="main-content">
         <h1>Welcome, <span th:text="${username}">User</span>!</h1>
-        <a href="/logout.html">Logout</a><br>
-        <a href="/classroom-auth" target="_blank">Classroom</a>
+        <p class="welcome-msg">Glad to see you here! Use the options below to get started.</p>
+
+        <div class="top-actions">
+            <a href="/classroom-auth" target="_blank" class="classroom-btn">Open Classroom</a>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+            <button class="create-btn" onclick="openModal()">+ Create Project</button>
+        </div>
+
+        <div class="project-section" th:if="${projects}">
+            <h3>Your Projects</h3>
+            <div class="project-grid">
+                <a class="project-card" th:each="project, iter : ${projects}"
+                   th:href="@{'/api/project/' + ${project.id}}"
+                   th:style="'--gradIndex:' + ${iter.index}">
+                    <div class="project-card-header" th:text="${project.title}"></div>
+                    <div class="project-card-body" th:text="${project.description}">No description</div>
+                </a>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -154,6 +212,24 @@
 </div>
 
 <script>
+    function logout() {
+        fetch('/ui/logout', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(response => {
+            if (response.ok) {
+                window.location.href = '/login';
+            } else {
+                alert('Logout failed.');
+            }
+        }).catch(err => {
+            console.error('Logout error:', err);
+            alert('An error occurred.');
+        });
+    }
+
     const modal = document.getElementById('createModal');
 
     function openModal() {
