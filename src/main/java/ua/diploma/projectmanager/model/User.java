@@ -35,9 +35,8 @@ public class User implements UserDetails {
     @Column(name = "email", unique = true)
     private String email;
 
-    private String password;
-
-    private int age;
+    @Column(name = "profile_image")
+    private String profileImage;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<UserProject> userProjects = new HashSet<>();
@@ -51,13 +50,12 @@ public class User implements UserDetails {
     }
 
     @Override
-    public String getUsername() {
-        return email;
+    public String getPassword() {
+        return "";
     }
 
-    @PostPersist
-    @PostUpdate
-    private void calculateDisplayName() {
-        this.displayName = firstName + " " + lastName;
+    @Override
+    public String getUsername() {
+        return email;
     }
 }
