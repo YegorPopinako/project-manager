@@ -3,6 +3,7 @@ package ua.diploma.projectmanager.dto.task;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ua.diploma.projectmanager.security.enums.TaskPriority;
 import ua.diploma.projectmanager.security.enums.TaskStatus;
 
 import java.time.LocalDate;
@@ -18,6 +19,8 @@ public class TaskDto {
     private String description;
 
     private TaskStatus status;
+
+    private TaskPriority priority;
 
     private LocalDate endPoint;
 

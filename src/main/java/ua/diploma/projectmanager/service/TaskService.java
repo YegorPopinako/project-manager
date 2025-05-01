@@ -46,6 +46,7 @@ public class TaskService {
         task.setTitle(taskDto.getTitle());
         task.setDescription(taskDto.getDescription());
         task.setStatus(taskDto.getStatus());
+        task.setPriority(taskDto.getPriority());
         task.setCreatedAt(LocalDateTime.now());
         task.setEndPoint(taskDto.getEndPoint());
         task.setProject(projectRepository.findById(taskDto.getProjectId()).orElseThrow(() ->

@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import ua.diploma.projectmanager.model.Project;
 import ua.diploma.projectmanager.model.User;
+import ua.diploma.projectmanager.security.enums.TaskPriority;
 import ua.diploma.projectmanager.security.enums.TaskStatus;
 
 import java.time.LocalDate;
@@ -20,6 +21,8 @@ public class TaskFullInfoDto {
     private String description;
 
     private TaskStatus status;
+
+    private TaskPriority priority;
 
     private LocalDate endPoint;
 

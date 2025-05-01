@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import ua.diploma.projectmanager.security.enums.TaskPriority;
 import ua.diploma.projectmanager.security.enums.TaskStatus;
 
 import java.time.LocalDate;
@@ -26,6 +27,10 @@ public class Task {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private TaskStatus status;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private TaskPriority priority;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id")
