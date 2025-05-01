@@ -32,6 +32,7 @@ public class NotificationService {
             notification.setUser(task.getUser());
             notification.setMessage("Task: " + task.getTitle() + " in project: " + task.getProject().getTitle());
             notification.setCreatedAt(LocalDate.now());
+            notification.setProjectId(task.getProject().getId());
             notificationRepository.save(notification);
         }
     }

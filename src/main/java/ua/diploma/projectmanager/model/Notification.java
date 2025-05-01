@@ -19,4 +19,6 @@ public class Notification {
 
     @ManyToOne
     private User user;
+
+    private Long projectId;
 }
