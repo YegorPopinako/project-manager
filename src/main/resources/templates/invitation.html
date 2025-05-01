@@ -3,6 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <title>Invite User</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-top: 40px;
+        }
+
+        form {
+            background-color: white;
+            max-width: 400px;
+            margin: 40px auto;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #34495e;
+        }
+
+        input[type="email"],
+        input[type="hidden"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccd1d9;
+            border-radius: 4px;
+            font-size: 1em;
+        }
+
+        button[type="submit"] {
+            width: 100%;
+            padding: 12px;
+            background-color: #3498db;
+            color: white;
+            font-size: 1em;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #2980b9;
+        }
+
+        .message {
+            text-align: center;
+            margin-top: 20px;
+            color: green;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
 <h1>Invite User to Project</h1>
@@ -11,13 +73,13 @@
     <input type="hidden" th:field="*{id}" />
 
     <label for="userEmail">User Email:</label>
-    <input type="email" id="userEmail" th:field="*{userEmail}" required /><br><br>
+    <input type="email" id="userEmail" th:field="*{userEmail}" required />
 
     <input type="hidden" th:field="*{type}" value="PROJECT"/>
 
     <button type="submit">Send Invitation</button>
 </form>
 
-<p th:if="${message}" th:text="${message}"></p>
+<p class="message" th:if="${message}" th:text="${message}"></p>
 </body>
 </html>
