@@ -351,6 +351,41 @@
             animation: pop 0.5s ease forwards;
         }
 
+        .priority-high,
+        .priority-medium,
+        .priority-low {
+            font-size: 0.8em; /* same as .task-meta */
+            color: #6b778c;   /* same muted gray */
+            background: none; /* remove background */
+            padding: 0;       /* remove padding */
+            border-radius: 0; /* remove border radius */
+            font-weight: normal; /* match other text */
+        }
+
+        .priority-text {
+            font-size: 0.8em;
+            color: #6b778c;
+            font-weight: normal;
+        }
+
+        .priority-high::before {
+            content: "●";
+            color: red;
+            margin-right: 4px;
+        }
+
+        .priority-medium::before {
+            content: "●";
+            color: orange;
+            margin-right: 4px;
+        }
+
+        .priority-low::before {
+            content: "●";
+            color: green;
+            margin-right: 4px;
+        }
+
         @keyframes pop {
             0% {
                 transform: scale(0.5);
@@ -463,6 +498,15 @@
             </div>
 
             <div>
+                <label for="priority">Priority:</label>
+                <select id="priority" name="priority" required>
+                    <option value="LOW">LOW</option>
+                    <option value="MEDIUM">MEDIUM</option>
+                    <option value="HIGH">HIGH</option>
+                </select>
+            </div>
+
+            <div>
                 <label for="endPoint">End Point:</label>
                 <input type="date" id="endPoint" name="endPoint" required/>
             </div>
@@ -487,6 +531,7 @@
              th:attr="data-id=${task.id},
               data-project-id=${task.project.id},
               data-status=${task.status},
+              data-priority=${task.priority},
               data-title=${task.title},
               data-description=${task.description},
               data-user=${task.user != null ? task.user.getEmail() : 'Unassigned'},
@@ -495,6 +540,9 @@
             <div class="task-desc" th:text="${task.description}"></div>
             <div class="task-meta">
                 Assigned to: <span th:text="${task.user != null ? task.user.getDisplayName() : 'Unassigned'}"></span>
+            </div>
+            <div class="task-priority">
+                <span class="priority-text">Priority:</span> <span th:text="${task.priority}" th:class="'priority-' + ${task.priority.name().toLowerCase()}"></span>
             </div>
         </div>
     </div>
@@ -563,6 +611,15 @@
             <div>
                 <label for="updateEndPoint">End Date:</label>
                 <input type="date" id="updateEndPoint" name="endPoint" required>
+            </div>
+
+            <div>
+                <label for="updatePriority">Priority:</label>
+                <select id="updatePriority" name="priority" required>
+                    <option value="LOW">LOW</option>
+                    <option value="MEDIUM">MEDIUM</option>
+                    <option value="HIGH">HIGH</option>
+                </select>
             </div>
 
             <button type="submit" class="modal-button update">Save Changes</button>
@@ -677,6 +734,7 @@
     let currentTaskId = null;
     let currentProjectId = null;
     let currentStatus = null;
+    let currentPriority = null;
 
     document.querySelectorAll('.task-card').forEach(card => {
         card.addEventListener('click', () => {
@@ -687,6 +745,7 @@
             currentTaskId = card.dataset.id;
             currentProjectId = card.dataset.projectId;
             currentStatus = card.dataset.status;
+            currentPriority = card.dataset.priority;
             modal.style.display = 'flex';
 
             const assignButtonContainer = document.getElementById('assignButtonContainer');
@@ -728,6 +787,7 @@
         document.getElementById('updateTaskId').value = currentTaskId;
         document.getElementById('updateProjectId').value = currentProjectId;
         document.getElementById('updateStatus').value = currentStatus;
+        document.getElementById('updatePriority').value = currentPriority;
         document.getElementById('updateTitle').value = modalTitle.textContent;
         document.getElementById('updateDescription').value = modalDesc.textContent;
         document.getElementById('updateEndPoint').value = modalEnd.textContent;
