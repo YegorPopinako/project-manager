@@ -1,0 +1,20 @@
+<!-- src/main/resources/templates/error.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Error</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 40px; color: #333; }
+        .error-container { max-width: 600px; margin: auto; text-align: center; }
+        .error-title { font-size: 2em; margin-bottom: 20px; }
+        .error-message { color: red; font-weight: bold; font-size: 1.2em; }
+    </style>
+</head>
+<body>
+<div class="error-container">
+    <div class="error-title">Something went wrong</div>
+    <div class="error-message" th:text="${errorMessage}">An unexpected error occurred.</div>
+</div>
+</body>
+</html>

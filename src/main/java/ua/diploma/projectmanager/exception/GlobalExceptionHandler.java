@@ -2,45 +2,45 @@ package ua.diploma.projectmanager.exception;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @Slf4j
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<String> handleEntityNotFoundException(EntityNotFoundException ex) {
-        log.error("Occurred Exception: {} ", ex.getMessage(), ex);
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+    public String handleEntityNotFoundException(EntityNotFoundException ex, Model model) {
+        log.error("Entity not found: {}", ex.getMessage(), ex);
+        model.addAttribute("errorMessage", ex.getMessage());
+        return "error";
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, String>> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
-        log.error("Occurred Exception: {} ", ex.getMessage(), ex);
-        HashMap<String, String> errors = new HashMap<>();
+    public String handleValidationException(MethodArgumentNotValidException ex, Model model) {
+        log.error("Validation error: {}", ex.getMessage(), ex);
+        StringBuilder errorMessages = new StringBuilder("Validation failed: ");
         for (FieldError error : ex.getBindingResult().getFieldErrors()) {
-            errors.put(error.getField(), error.getDefaultMessage());
+            errorMessages.append(error.getField()).append(" - ").append(error.getDefaultMessage()).append("; ");
         }
-        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+        model.addAttribute("errorMessage", errorMessages.toString());
+        return "error";
     }
 
     @ExceptionHandler(EmailAlreadyInUseException.class)
-    public ResponseEntity<String> handleEmailAlreadyInUseException(EmailAlreadyInUseException ex) {
-        log.error("Occurred Exception: {} ", ex.getMessage(), ex);
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    public String handleEmailAlreadyInUseException(EmailAlreadyInUseException ex, Model model) {
+        log.error("Email in use: {}", ex.getMessage(), ex);
+        model.addAttribute("errorMessage", ex.getMessage());
+        return "error";
     }
 
     @ExceptionHandler(IllegalStateException.class)
-    public ResponseEntity<String> handleIllegalStateException(IllegalStateException ex) {
-        log.error("Occurred Exception: {} ", ex.getMessage(), ex);
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    public String handleIllegalStateException(IllegalStateException ex, Model model) {
+        log.error("Illegal state: {}", ex.getMessage(), ex);
+        model.addAttribute("errorMessage", ex.getMessage());
+        return "error";
     }
 }
