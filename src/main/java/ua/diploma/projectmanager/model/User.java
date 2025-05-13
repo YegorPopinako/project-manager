@@ -35,8 +35,9 @@ public class User implements UserDetails {
     @Column(name = "email", unique = true)
     private String email;
 
-    @Column(name = "profile_image")
-    private String profileImage;
+    @Lob
+    @Column(name = "profile_image", columnDefinition = "MEDIUMBLOB")
+    private byte[] profileImage;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<UserProject> userProjects = new HashSet<>();

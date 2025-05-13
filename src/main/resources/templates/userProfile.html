@@ -89,7 +89,7 @@
 <div th:insert="fragments/navbar :: navbar(${notifications})"></div>
 
 <div class="profile-page">
-    <img th:src="@{${userDto.profileImage}}" alt="Profile Image" class="profile-image">
+    <img th:src="@{'/api/user/' + ${userDto.id} + '/image'}" alt="Profile Image" class="profile-image"/>
 
     <form th:action="@{/api/user}" th:object="${userDto}" method="post" class="profile-form" id="profileForm">
         <input type="hidden" name="_method" value="put"/>

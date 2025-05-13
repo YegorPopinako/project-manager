@@ -10,5 +10,4 @@ public class UserFullInfoDto {
     private String firstName;
     private String lastName;
     private String email;
-    private String profileImage;
 }

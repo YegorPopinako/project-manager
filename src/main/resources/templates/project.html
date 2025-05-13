@@ -420,7 +420,7 @@
             <div class="user-list">
                 <div th:each="user : ${users}" class="user-item"
                      th:title="${user.firstName + ' ' + user.lastName + ' (' + user.email + ')'}">
-                    <img th:src="${user.profileImage}" alt="Profile" class="profile-img"/>
+                    <img th:src="@{'/api/user/' + ${user.id} + '/image'}" alt="Profile" class="profile-img"/>
                     <span th:text="${user.displayName}"></span>
 
                     <div th:if="${isOwner && user.email != authentication.name}" class="delete-btn-container">

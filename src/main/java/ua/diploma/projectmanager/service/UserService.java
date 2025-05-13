@@ -23,6 +23,9 @@ import ua.diploma.projectmanager.security.enums.AssignmentType;
 import ua.diploma.projectmanager.security.enums.Role;
 import ua.diploma.projectmanager.service.mapper.UserMapper;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.List;
 import java.util.Optional;
 
@@ -96,15 +99,29 @@ public class UserService {
     }
 
     @Transactional
-    public void registerIfAbsent(String email, String firstName, String lastName, String profileImage) {
-        if(!userRepository.existsByEmail(email)) {
+    public void registerIfAbsent(String email, String firstName, String lastName, String imageUrl) {
+        if (!userRepository.existsByEmail(email)) {
             User user = new User();
             user.setEmail(email);
             user.setFirstName(firstName);
             user.setLastName(lastName);
-            user.setProfileImage(profileImage);
+            user.setDisplayName(firstName + " " + lastName);
+
+            try (InputStream in = new URL(imageUrl).openStream()) {
+                byte[] imageData = in.readAllBytes();
+                user.setProfileImage(imageData);
+            } catch (IOException e) {
+                user.setProfileImage(null);
+            }
             userRepository.save(user);
         }
+    }
+
+    @Transactional
+    public byte[] getUserImage(Long id){
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+        return user.getProfileImage();
     }
 
     public List<ProjectFullInfoDto> getUserProjects(String name) {

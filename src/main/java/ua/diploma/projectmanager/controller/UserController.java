@@ -1,13 +1,15 @@
 package ua.diploma.projectmanager.controller;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import ua.diploma.projectmanager.dto.user.UserFullInfoDto;
 import ua.diploma.projectmanager.dto.user.UserUpdateDto;
 import ua.diploma.projectmanager.model.Notification;
@@ -41,5 +43,23 @@ public class UserController {
         model.addAttribute("notifications", notifications);
         model.addAttribute("userDto", updatedUser);
         return "userProfile";
+    }
+
+    @GetMapping("/{id}/image")
+    public ResponseEntity<byte[]> getUserImage(@PathVariable Long id) {
+        try {
+            byte[] imageData = userService.getUserImage(id);
+
+            if (imageData == null || imageData.length == 0) {
+                return ResponseEntity.notFound().build();
+            }
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.IMAGE_JPEG);
+            return new ResponseEntity<>(imageData, headers, HttpStatus.OK);
+
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 }
